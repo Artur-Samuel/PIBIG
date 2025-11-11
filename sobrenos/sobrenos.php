@@ -3,9 +3,6 @@
 <link rel="stylesheet" href="sobrenos.css">
 </head>
 <body>
-
-<?php // include 'menu.php'; // descomente se tiver um header/menu compartilhado ?>
-
 <header class="hero">
 <div class="hero-inner">
 <div class="logo-small">PIB Iguaçu</div>
