@@ -1,0 +1,372 @@
+/* ============ Base ============ */
+:root{
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  --text: #0f172a;     /* slate-900 */
+  --muted: #475569;    /* slate-600 */
+  --border: #e2e8f0;   /* slate-200 */
+  --card: #ffffff;
+
+  --shadow: 0 12px 30px rgba(2, 32, 71, .10);
+  --shadow-sm: 0 6px 16px rgba(2, 32, 71, .10);
+
+  --radius: 16px;
+  --radius-sm: 12px;
+  --focus: 0 0 0 4px rgba(59, 130, 246, .18);
+}
+
+*{ box-sizing: border-box; }
+html, body { height: 100%; }
+
+body{
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--text);
+
+  /* Fundo branco + azul bem suave */
+  background:
+    radial-gradient(1100px 420px at 10% -10%, rgba(59,130,246,.15), transparent 55%),
+    radial-gradient(900px 420px at 90% 0%, rgba(37,99,235,.12), transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+/* Centraliza o layout (título, ações e card) */
+body > h2,
+body > .escala-actions,
+body > .card-escala{
+  width: min(1100px, calc(100% - 40px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============ Título ============ */
+.titulo-escala{
+  margin: 34px auto 14px;
+  font-size: clamp(22px, 2.2vw, 34px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+
+  position: relative;
+  padding-left: 16px;
+}
+
+.titulo-escala::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 6px;
+  height: 0.95em;      /* acompanha a altura do texto */
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1d4ed8, #3b82f6);
+}
+
+/* ============ Botões (links) ============ */
+.bnt-me-escalar,
+.bnt-escalar{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+  margin: 8px 8px 18px 0;
+  user-select: none;
+}
+
+/* Primário */
+.bnt-me-escalar{
+  color: white;
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .22);
+}
+
+/* Secundário */
+.bnt-escalar{
+  color: var(--blue-700);
+  background: linear-gradient(180deg, #ffffff, #f4f8ff);
+  border: 1px solid var(--blue-200);
+  box-shadow: 0 10px 18px rgba(2, 32, 71, .08);
+}
+
+.bnt-me-escalar:hover,
+.bnt-escalar:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.bnt-me-escalar:active,
+.bnt-escalar:active{
+  transform: translateY(0px);
+}
+
+.bnt-me-escalar:focus-visible,
+.bnt-escalar:focus-visible{
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+/* ============ Card ============ */
+.card-escala{
+  background: rgba(255,255,255,.78);
+  border: 1px solid rgba(226,232,240,.8);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 10px auto 30px;
+
+  /* IMPORTANTE */
+  overflow: visible;
+}
+
+/* ============ Tabela ============ */
+.tabela-escala{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0 !important; /* ignora border="1" do HTML */
+}
+
+.tabela-escala th,
+.tabela-escala td{
+  padding: 14px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.tabela-escala thead th,
+.tabela-escala tr:first-child th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  color: #0b2a66;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  border-bottom: 1px solid rgba(191,219,254,.9);
+}
+
+/* zebra + hover */
+.tabela-escala tbody tr:nth-child(odd){
+  background: rgba(239,246,255,.55); /* blue-50 */
+}
+
+.tabela-escala tbody tr:hover{
+  background: rgba(219,234,254,.75); /* blue-100 */
+}
+
+.tabela-escala td:nth-child(1),
+.tabela-escala td:nth-child(2){
+  font-weight: 700;
+  color: #0b2a66;
+  white-space: nowrap;
+}
+
+.tabela-escala td{
+  color: var(--text);
+}
+
+/* Quando não tem pessoa */
+.tabela-escala td:has(> :not(a)):not(:has(> a)){
+  /* só melhora leitura; sem efeitos agressivos */
+   color: #1e293b;
+}
+
+/* ============ Botões pequenos dentro da tabela ============ */
+.btn-remover,
+.btn-lixeira{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease, color .12s ease;
+  font-weight: 900;
+}
+
+/* Remover: azul claro com destaque */
+.btn-remover{
+  color: var(--blue-700);
+  background: rgba(59,130,246,.10);
+  border: 1px solid rgba(59,130,246,.22);
+}
+
+.btn-remover:hover{
+  background: rgba(59,130,246,.16);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(59,130,246,.18);
+}
+
+/* Lixeira: mantém no tema (azul), mas mais “forte” */
+.btn-lixeira{
+  color: white;
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+  border: 1px solid rgba(29,78,216,.35);
+}
+
+.btn-lixeira:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(37,99,235,.25);
+}
+
+.btn-remover:focus-visible,
+.btn-lixeira:focus-visible{
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+/* ============ Responsivo ============ */
+@media (max-width: 920px){
+  body > h2,
+  body > a,
+  body > .card-escala{
+    width: calc(100% - 22px);
+  }
+
+  .tabela-escala th,
+  .tabela-escala td{
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Scroll horizontal no mobile */
+@media (max-width: 720px){
+  .card-escala{
+    overflow-x: auto;
+  }
+
+  .tabela-escala{
+    min-width: 780px;
+  }
+}
+.escala-actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 8px auto 14px;
+}
+
+.nome-escala{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Centraliza o layout inteiro */
+body{
+  margin: 0;
+}
+
+/* Mesma largura e centralização para tudo */
+.titulo-escala,
+.escala-actions,
+.card-escala{
+  width: min(1200px, calc(100% - 80px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* No mobile, menos margem lateral */
+@media (max-width: 720px){
+  .titulo-escala,
+  .escala-actions,
+  .card-escala{
+    width: calc(100% - 24px);
+  }
+}
+
+/* Ações (botões) alinhadas */
+.escala-actions{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+/* Tabela bem comportada e centralizada dentro do card */
+.tabela-escala{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Remove qualquer "border=1" visual antigo */
+.tabela-escala, .tabela-escala th, .tabela-escala td{
+  border: none !important;
+}
+
+/* linhas horizontais */
+.tabela-escala th,
+.tabela-escala td{
+  border-bottom: 1px solid rgba(226,232,240,.95) !important;
+}
+
+/* ===== Divisões verticais ===== */
+/* Entre Data (col 1) e Turno (col 2) */
+.tabela-escala th:nth-child(2),
+.tabela-escala td:nth-child(2){
+  border-left: 1px solid rgba(191,219,254,.9) !important; /* azul claro */
+}
+
+/* Entre Turno (col 2) e Funções (col 3 em diante) */
+.tabela-escala th:nth-child(3),
+.tabela-escala td:nth-child(3){
+  border-left: 2px solid rgba(59,130,246,.35) !important; /* azul mais forte */
+}
+
+/* Opcional: um pouco de “respiro” após as divisões */
+.tabela-escala th:nth-child(2),
+.tabela-escala td:nth-child(2),
+.tabela-escala th:nth-child(3),
+.tabela-escala td:nth-child(3){
+  padding-left: 18px;
+}
+
+/* Divisão sutil entre as colunas de funções (a partir da 4ª) */
+.tabela-escala th:nth-child(n+4),
+.tabela-escala td:nth-child(n+4){
+  border-left: 3px solid rgba(226,232,240,.9) !important;
+}
+
+.tabela-escala{ margin: 0 auto; }
+.card-escala{ margin-left: auto !important; margin-right: auto !important; }
+
+.escala-header{
+margin-left: 110px;
+}
+
+.col-funcao{
+  text-align: center;
+}
+
+.col-text{
+  text-align: center;
+}
