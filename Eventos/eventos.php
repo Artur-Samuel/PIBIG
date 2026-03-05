@@ -1,88 +1,111 @@
 <?php
-require_once 'config.php';
-
 session_start();
-
-
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
+require "conexao.php";
+include "../Header.php";
 
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// captura de dados
-$usuarioId = $_SESSION['usuario_id'];
-$tipoUsuario = $_SESSION['tipo'] ?? 'usuario'; 
-$isAdmin = ($tipoUsuario === 'admin');
+// Buscar eventos
+$sql = "SELECT * FROM eventos ORDER BY data_evento ASC";
+$result = $conn->query($sql);
+?>
 
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" type="image/png" href="../imagens/icon.png">
+        <title>Eventos</title>
+        <style>
+            html, body { height: 100%; }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //validação
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        die("Erro de validação CSRF: Ação bloqueada.");
-    }
-
-
-    if ($isAdmin && isset($_POST['acao'])) {
-        $acao = $_POST['acao'];
-        $stmt = null; 
-
-        try {
-            switch ($acao) {
-                case "adicionar":
-                    $sql = "INSERT INTO eventos (titulo, descricao, data_evento) VALUES (?, ?, ?)";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("sss", $_POST['titulo'], $_POST['descricao'], $_POST['data_evento']);
-                    $_SESSION['success_message'] = "Evento adicionado com sucesso!";
-                    break;
-
-                case "editar":
-                    $sql = "UPDATE eventos SET titulo=?, descricao=?, data_evento=? WHERE id=?";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("sssi", $_POST['titulo'], $_POST['descricao'], $_POST['data_evento'], $_POST['id']);
-                    $_SESSION['success_message'] = "Evento atualizado com sucesso!";
-                    break;
-
-                case "excluir":
-                    $sql = "DELETE FROM eventos WHERE id=?";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("i", $_POST['id']);
-                    $_SESSION['success_message'] = "Evento excluído com sucesso!";
-                    break;
+            body { background: #eef2f7; 
+            font-family: Arial; 
+            margin:0; 
+            padding:0; 
             }
 
-            // Executa o statement se ele foi preparado
-            if ($stmt) {
-                if (!$stmt->execute()) {
-                    // Se houver um erro, armazena a mensagem de erro
-                    $_SESSION['error_message'] = "Erro ao executar a operação: " . $stmt->error;
-                    unset($_SESSION['success_message']); // Remove a mensagem de sucesso
-                }
-                $stmt->close();
+            .container { width: 90%; max-width: 900px; margin: 40px auto; }
+
+            h1 { text-align:center; color:#003399; }
+
+            .evento {
+                background:#fff;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:20px;
+                box-shadow:0px 2px 5px rgba(0,0,0,0.2);
+                display:flex;
+                gap:15px;
+                align-items: center;
             }
-        } catch (Exception $e) {
-            $_SESSION['error_message'] = "Ocorreu um erro: " . $e->getMessage();
-            unset($_SESSION['success_message']);
-        }
 
-        // Redireciona para a mesma página para evitar reenvio de formulário (Padrão PRG)
-        header("Location: eventos.php");
-        exit();
-    }
-}
+            .evento img {
+                width:120px;
+                height:120px;
+                object-fit:cover;
+                border-radius:10px;
+            }
 
-// --- Busca de Dados para Exibição ---
-$result = $conn->query("SELECT * FROM eventos ORDER BY data_evento DESC");
-$eventos = $result->fetch_all(MYSQLI_ASSOC);
+            .info { flex:1; }
+            .titulo { font-size:20px; font-weight:bold; color:#003399; }
 
-// Fecha a conexão com o banco de dados
-$conn->close();
+            .acao a, .novo-evento {
+                text-decoration:none;
+                padding:8px 14px;
+                border-radius:6px;
+                color:white;
+                font-size:14px;
+            }
 
-// --- Exibição ---
-// Ao final de toda a lógica, inclui o arquivo de visualização
-require_once 'eventos_view.php';
+            .editar { background:#007bff; }
+            .excluir { background:#d9534f; }
+            .novo-evento { background:#28a745; display:inline-block; margin-bottom:20px; }
+
+            .acao a:hover { opacity:0.85; }
+            .novo-evento:hover { opacity:0.85; }
+            
+        </style>
+    </head>
+<body>
+
+<div class="container">
+    <h1>Eventos</h1>
+
+    <!-- Botão Criar Evento -->
+    <?php if ($_SESSION['usuario_role'] == 'admin'): ?>
+        <a href="criar_evento.php" class="novo-evento">+ Criar Novo Evento</a>
+    <?php endif; ?>
+
+    <?php while ($evento = $result->fetch_assoc()): ?>
+        <div class="evento">
+            <img src="uploads/<?= $evento['imagem'] ?>" alt="Imagem do evento">
+
+            <div class="info">
+                <div class="titulo"><?= $evento['titulo'] ?></div>
+                <p><?= nl2br($evento['descricao']) ?></p>
+                <small><strong>Data do evento:</strong> <?= $evento['data_evento'] ?></small>
+            </div>
+
+            <div class="acao">
+                <!-- Apenas ADMIN pode Editar ou Excluir -->
+                <?php if ($_SESSION['usuario_role'] == 'admin'): ?>
+                    <a href="editar_evento.php?id=<?= $evento['id'] ?>" class="editar">Editar</a><br><br>
+                    <a href="excluir_evento.php?id=<?= $evento['id'] ?>" class="excluir" onclick="return confirm('Deseja realmente excluir este evento?');">Excluir</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endwhile; ?>
+
+    <br><a href="../index.php">← Voltar ao início</a>
+</div>
+
+<?php
+    include '../rodape.html';
+?>
+
+</body>
+</html>
